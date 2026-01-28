@@ -1,0 +1,7 @@
+# conjunto de simbolos
+# alfabeto de letras
+abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+#alfabeto de numeros
+123456790
+# alfabeto de guion bajo
+_
