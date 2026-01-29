@@ -2,6 +2,6 @@
 # alfabeto de letras
 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 #alfabeto de numeros
-123456790
+1234567890
 # alfabeto de guion bajo
 _
