@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+
 #define MAX_SYMBOLS 128
 #define MAX_STRINGS 2048
 #define MAX_LEN 64
@@ -55,6 +56,11 @@ int leer_alfabetos(const char *filename, Alfabeto alphabets[]) {
     char line[BUF_SIZE];
     int count = 0;
 
+    if (!f) {
+        perror("No se pudo abrir data.txt");
+        return 0;
+    }
+
     while (fgets(line, sizeof(line), f)) {
         if (line[0] == '#')
             continue;
@@ -74,51 +80,43 @@ int leer_alfabetos(const char *filename, Alfabeto alphabets[]) {
     return count;
 }
 
-Lenguaje concatenacion(const Lenguaje *A, const Lenguaje *B) {
-    Lenguaje R;
-    R.size = 0;
+void generar_rest_kleene(FILE *out, const Lenguaje *rest, const char *prefijo,
+                         int profundidad) {
+    // Escribimos la cadena actual
+    fprintf(out, "%s\n", prefijo);
 
-    for (int i = 0; i < A->size; i++)
-        for (int j = 0; j < B->size; j++) {
-            // Limite de largo de cadenas
-            if (strlen(A->cadenas[i]) + strlen(B->cadenas[j]) > MAX_STR_LEN)
-                continue;
+    if (profundidad == 0)
+        return;
 
-            if (R.size >= MAX_STRINGS)
-                return R;
+    char buffer[MAX_LEN];
 
-            strcpy(R.cadenas[R.size], A->cadenas[i]);
-            strcat(R.cadenas[R.size], B->cadenas[j]);
-            R.size++;
-        }
-    return R;
+    for (int i = 0; i < rest->size; i++) {
+        if (strlen(prefijo) + strlen(rest->cadenas[i]) > MAX_STR_LEN)
+            continue;
+
+        strcpy(buffer, prefijo);
+        strcat(buffer, rest->cadenas[i]);
+
+        generar_rest_kleene(out, rest, buffer, profundidad - 1);
+    }
 }
 
-Lenguaje kleene(const Lenguaje *L) {
-    Lenguaje R;
-    R.size = 1;
-    strcpy(R.cadenas[0], ""); // ε
+void generar_identificadores(FILE *out, const Lenguaje *first,
+                             const Lenguaje *rest) {
+    char buffer[MAX_LEN];
 
-    Lenguaje current = *L;
-
-    for (int i = 1; i <= MAX_KLEENE; i++) {
-        for (int j = 0; j < current.size; j++) {
-            if (R.size >= MAX_STRINGS)
-                return R;
-
-            strcpy(R.cadenas[R.size++], current.cadenas[j]);
-        }
-        current = concatenacion(&current, L);
+    for (int i = 0; i < first->size; i++) {
+        strcpy(buffer, first->cadenas[i]);
+        generar_rest_kleene(out, rest, buffer, MAX_KLEENE);
     }
-
-    return R;
 }
 
 int main() {
     Alfabeto alfabetos[3];
+
     int n = leer_alfabetos("data.txt", alfabetos);
 
-    // Lenguajes construidos POR seleccion entre alternativas
+    // Lenguajes base
     Lenguaje L_alpha = construir_lenguaje_desde_alfabeto(alfabetos[0]);
     Lenguaje L_digits = construir_lenguaje_desde_alfabeto(alfabetos[1]);
     Lenguaje L_guion = construir_lenguaje_desde_alfabeto(alfabetos[2]);
@@ -129,28 +127,12 @@ int main() {
     // (letra | digito | _)
     Lenguaje rest = seleccion_alternativas(&first, &L_digits);
 
-    // (letra | digito | _)*
-    Lenguaje rest_kleene = kleene(&rest);
+    FILE *out = fopen("identificadores.txt", "w");
 
-    // identificadores
-    Lenguaje identificadores = concatenacion(&first, &rest_kleene);
+    generar_identificadores(out, &first, &rest);
 
-    printf("Total identificadores generados: %d\n", identificadores.size);
+    fclose(out);
 
-    for (int i = 0; i < identificadores.size && i < 20; i++) {
-        printf("[%d] %s\n", i, identificadores.cadenas[i]);
-    }
-
-    // Buscar cadenas pedidas
-    for (int i = 0; i < identificadores.size; i++) {
-        if (!strcmp(identificadores.cadenas[i], "amigo_1") ||
-            !strcmp(identificadores.cadenas[i], "a1b1c2d1") ||
-            !strcmp(identificadores.cadenas[i], "hola") ||
-            !strcmp(identificadores.cadenas[i], "a1z1b2y2")) {
-            printf("Encontrado %s en posicion %d\n", identificadores.cadenas[i],
-                   i);
-        }
-    }
-
+    printf("Identificadores generados en identificadores.txt\n");
     return 0;
 }
