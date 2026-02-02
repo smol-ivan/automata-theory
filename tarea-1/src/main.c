@@ -2,10 +2,10 @@
 #include <string.h>
 #define MAX_SYMBOLS 128
 #define MAX_STRINGS 2048
-#define MAX_LEN 32
+#define MAX_LEN 64
 #define MAX_STR_LEN 8
 #define BUF_SIZE 256
-#define MAX_KLEENE 3
+#define MAX_KLEENE 7
 
 typedef struct {
     char name[32];
@@ -26,15 +26,15 @@ Lenguaje lenguaje_elemental(char symbol) {
     return L;
 }
 
-Lenguaje seleccion_alternativas(Lenguaje A, Lenguaje B) {
+Lenguaje seleccion_alternativas(const Lenguaje *A, const Lenguaje *B) {
     Lenguaje R;
     R.size = 0;
 
-    for (int i = 0; i < A.size; i++)
-        strcpy(R.cadenas[R.size++], A.cadenas[i]);
+    for (int i = 0; i < A->size && R.size < MAX_STRINGS; i++)
+        strcpy(R.cadenas[R.size++], A->cadenas[i]);
 
-    for (int i = 0; i < B.size; i++)
-        strcpy(R.cadenas[R.size++], B.cadenas[i]);
+    for (int i = 0; i < B->size && R.size < MAX_STRINGS; i++)
+        strcpy(R.cadenas[R.size++], B->cadenas[i]);
 
     return R;
 }
@@ -44,7 +44,7 @@ Lenguaje construir_lenguaje_desde_alfabeto(Alfabeto A) {
 
     for (int i = 1; i < A.size; i++) {
         Lenguaje elem = lenguaje_elemental(A.simbolos[i]);
-        result = seleccion_alternativas(result, elem);
+        result = seleccion_alternativas(&result, &elem);
     }
 
     return result;
@@ -74,33 +74,41 @@ int leer_alfabetos(const char *filename, Alfabeto alphabets[]) {
     return count;
 }
 
-Lenguaje concatenacion(Lenguaje A, Lenguaje B) {
+Lenguaje concatenacion(const Lenguaje *A, const Lenguaje *B) {
     Lenguaje R;
     R.size = 0;
 
-    for (int i = 0; i < A.size; i++)
-        for (int j = 0; j < B.size; j++) {
+    for (int i = 0; i < A->size; i++)
+        for (int j = 0; j < B->size; j++) {
             // Limite de largo de cadenas
-            if (strlen(A.cadenas[i]) + strlen(B.cadenas[j]) > MAX_STR_LEN)
+            if (strlen(A->cadenas[i]) + strlen(B->cadenas[j]) > MAX_STR_LEN)
                 continue;
-            snprintf(R.cadenas[R.size++], MAX_LEN, "%s%s", A.cadenas[i],
-                     B.cadenas[j]);
+
+            if (R.size >= MAX_STRINGS)
+                return R;
+
+            strcpy(R.cadenas[R.size], A->cadenas[i]);
+            strcat(R.cadenas[R.size], B->cadenas[j]);
+            R.size++;
         }
     return R;
 }
 
-Lenguaje kleene(Lenguaje L) {
+Lenguaje kleene(const Lenguaje *L) {
     Lenguaje R;
     R.size = 1;
     strcpy(R.cadenas[0], ""); // ε
 
-    Lenguaje current = L;
+    Lenguaje current = *L;
 
     for (int i = 1; i <= MAX_KLEENE; i++) {
-        for (int j = 0; j < current.size; j++)
-            strcpy(R.cadenas[R.size++], current.cadenas[j]);
+        for (int j = 0; j < current.size; j++) {
+            if (R.size >= MAX_STRINGS)
+                return R;
 
-        current = concatenacion(current, L);
+            strcpy(R.cadenas[R.size++], current.cadenas[j]);
+        }
+        current = concatenacion(&current, L);
     }
 
     return R;
@@ -116,21 +124,28 @@ int main() {
     Lenguaje L_guion = construir_lenguaje_desde_alfabeto(alfabetos[2]);
 
     // (letra | _)
-    Lenguaje first = seleccion_alternativas(L_alpha, L_guion);
+    Lenguaje first = seleccion_alternativas(&L_alpha, &L_guion);
 
     // (letra | digito | _)
-    Lenguaje rest = seleccion_alternativas(first, L_digits);
+    Lenguaje rest = seleccion_alternativas(&first, &L_digits);
 
     // (letra | digito | _)*
-    Lenguaje rest_kleene = kleene(rest);
+    Lenguaje rest_kleene = kleene(&rest);
 
     // identificadores
-    Lenguaje identificadores = concatenacion(first, rest_kleene);
+    Lenguaje identificadores = concatenacion(&first, &rest_kleene);
+
+    printf("Total identificadores generados: %d\n", identificadores.size);
+
+    for (int i = 0; i < identificadores.size && i < 20; i++) {
+        printf("[%d] %s\n", i, identificadores.cadenas[i]);
+    }
 
     // Buscar cadenas pedidas
     for (int i = 0; i < identificadores.size; i++) {
         if (!strcmp(identificadores.cadenas[i], "amigo_1") ||
             !strcmp(identificadores.cadenas[i], "a1b1c2d1") ||
+            !strcmp(identificadores.cadenas[i], "hola") ||
             !strcmp(identificadores.cadenas[i], "a1z1b2y2")) {
             printf("Encontrado %s en posicion %d\n", identificadores.cadenas[i],
                    i);
