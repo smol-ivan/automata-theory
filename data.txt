@@ -1,7 +1,7 @@
 # conjunto de simbolos
 # alfabeto de letras
-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+alpha:abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 #alfabeto de numeros
-1234567890
+digitos:1234567890
 # alfabeto de guion bajo
-_
+guion:_

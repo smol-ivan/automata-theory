@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
     Nob_Cmd cmd = {0};
 
     // On POSIX
-    nob_cmd_append(&cmd, "cc", "-Wall", "-Wextra", "-o",
+    nob_cmd_append(&cmd, "gcc", "-Wall", "-Wextra", "-g", "-O0", "-o",
                    BUILD_FOLDER "automata", SRC_FOLDER "main.c");
 
     if (!nob_cmd_run(&cmd))
