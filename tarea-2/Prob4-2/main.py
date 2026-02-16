@@ -1,3 +1,4 @@
+import argparse
 import unicodedata
 
 
@@ -95,6 +96,7 @@ def buscar_raiz(texto, raiz):
             estado_actual = "s0"
             inicio_palabra = None
             raiz_encontrada = False
+            palabra_actual = ""
             continue
 
         columna += 1
@@ -132,14 +134,28 @@ def buscar_raiz(texto, raiz):
     return ocurrencias
 
 
-with open("texto.txt", encoding="utf-8") as f:
-    texto = normalizar(f.read())
+def main():
+    parser = argparse.ArgumentParser(description="Buscador de palabras que contienen una raiz")
+    parser.add_argument(
+        "--text-file",
+        default="texto.txt",
+        help="Ruta al archivo de texto para analizar",
+    )
+    parser.add_argument("--raiz", help="Raiz a buscar")
+    args = parser.parse_args()
 
-raiz = input("Raiz: ")
+    with open(args.text_file, encoding="utf-8") as f:
+        texto = normalizar(f.read())
 
-ocurrencias = buscar_raiz(texto, raiz)
+    raiz = normalizar(args.raiz) if args.raiz is not None else normalizar(input("Raiz: "))
 
-for ocurrencia in ocurrencias:
-    print(ocurrencia)
+    ocurrencias = buscar_raiz(texto, raiz)
 
-print(f"\nTotal: {len(ocurrencias)} ocurencias")
+    for ocurrencia in ocurrencias:
+        print(ocurrencia)
+
+    print(f"\nTotal: {len(ocurrencias)} ocurencias")
+
+
+if __name__ == "__main__":
+    main()
