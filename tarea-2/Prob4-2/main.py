@@ -135,7 +135,9 @@ def buscar_raiz(texto, raiz):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Buscador de palabras que contienen una raiz")
+    parser = argparse.ArgumentParser(
+        description="Buscador de palabras que contienen una raiz"
+    )
     parser.add_argument(
         "--text-file",
         default="texto.txt",
@@ -147,7 +149,9 @@ def main():
     with open(args.text_file, encoding="utf-8") as f:
         texto = normalizar(f.read())
 
-    raiz = normalizar(args.raiz) if args.raiz is not None else normalizar(input("Raiz: "))
+    raiz = (
+        normalizar(args.raiz) if args.raiz is not None else normalizar(input("Raiz: "))
+    )
 
     ocurrencias = buscar_raiz(texto, raiz)
 

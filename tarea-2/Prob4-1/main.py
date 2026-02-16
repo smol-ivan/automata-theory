@@ -49,7 +49,11 @@ def main():
     args = parser.parse_args()
 
     afd = cargar_afd(args.afd_file)
-    cadena = args.cadena if args.cadena is not None else input("Ingrese la cadena a analizar:")
+    cadena = (
+        args.cadena
+        if args.cadena is not None
+        else input("Ingrese la cadena a analizar:")
+    )
 
     secuencia, resultado, error = simular_afd(afd, cadena)
 

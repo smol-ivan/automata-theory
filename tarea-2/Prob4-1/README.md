@@ -1,6 +1,6 @@
 # Instrucciones de Ejecucion Prob4-1
 
-El simulador ahora acepta el archivo del AFD por argumento, por lo que puedes usar multiples casos de prueba.
+El simulador acepta el archivo del AFD por argumento
 
 ## Casos de prueba incluidos
 
@@ -17,4 +17,4 @@ python3 main.py --afd-file formato_entrada.json --cadena 1010
 python3 main.py --afd-file formato_entrada_case2.json --cadena 1100
 ```
 
-Si no envias `--cadena`, el programa la solicita por consola.
+Si no se usa `--cadena`, el programa la solicita por consola.

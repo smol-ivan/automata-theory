@@ -1,6 +1,6 @@
 # Instrucciones de Ejecucion Prob4-2
 
-El buscador de raices ahora acepta el archivo de texto por argumento para ejecutar multiples casos de prueba.
+El buscador de raices acepta el archivo de texto por argumento 
 
 ## Casos de prueba incluidos
 
@@ -17,4 +17,4 @@ python3 main.py --text-file texto.txt --raiz amor
 python3 main.py --text-file texto_case2.txt --raiz program
 ```
 
-Si no envias `--raiz`, el programa la solicita por consola.
+Si no se usa `--raiz`, el programa la solicita por consola.
