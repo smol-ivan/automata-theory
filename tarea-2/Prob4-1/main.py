@@ -60,6 +60,7 @@ def main():
     if error is not None:
         print(error)
 
+    print(f"Cadena: {cadena}")
     print("Secuencia: ->", secuencia)
     print("Resultado:", resultado)
 
