@@ -1,3 +1,4 @@
+import argparse
 import re
 
 
@@ -13,10 +14,41 @@ def extraer_urls(texto):
     return urls
 
 
-texto = "Visita https://github.com y también www.google.com para más info"
+def leer_texto(args):
+    if args.text_file:
+        with open(args.text_file, encoding="utf-8") as f:
+            return f.read()
 
-urls = extraer_urls(texto)
+    if args.text:
+        return args.text
 
-print("URLs encontradas:")
-for i, url in enumerate(urls, 1):
-    print(f"{i}. {url}")
+    print("Ingresa el texto a analizar:")
+    return input("> ")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Extractor simple de URLs")
+    parser.add_argument(
+        "--text-file",
+        help="Ruta de archivo de texto a analizar",
+    )
+    parser.add_argument(
+        "--text",
+        help="Texto directo a analizar",
+    )
+    args = parser.parse_args()
+
+    texto = leer_texto(args)
+    urls = extraer_urls(texto)
+
+    print("URLs encontradas:")
+    if not urls:
+        print("No se encontraron URLs.")
+        return
+
+    for i, url in enumerate(urls, 1):
+        print(f"{i}. {url}")
+
+
+if __name__ == "__main__":
+    main()
