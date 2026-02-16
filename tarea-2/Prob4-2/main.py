@@ -15,22 +15,10 @@ class Ocurrencia:
         resaltada = self.palabra.replace(
             self.raiz,
             f"{ROJO}{self.raiz}{RESET}",
-            1,  # solo la primera aparición
+            1,
         )
 
         return f"Linea {self.linea}, Col {self.columna}: {resaltada}"
-
-
-class Ocurrencia:
-    def __init__(self, palabra, linea, columna) -> None:
-        self.palabra = palabra
-        self.linea = linea
-        self.columna = columna
-
-    def __str__(self) -> str:
-        RESET = "\033[0m"
-        ROJO = "\033[31m"
-        return f"Linea {self.linea}, Col {self.columna}: {ROJO}{self.palabra}{RESET}"
 
 
 def normalizar(texto):
@@ -98,7 +86,9 @@ def buscar_raiz(texto, raiz):
         if simbolo == "\n":
             # Si hay un salto de linea puede que la ultima palabra tenga la raiz
             if palabra_actual and raiz_encontrada:
-                ocurrencias.append(Ocurrencia(palabra_actual, linea, inicio_palabra))
+                ocurrencias.append(
+                    Ocurrencia(palabra_actual, raiz, linea, inicio_palabra)
+                )
 
             linea += 1
             columna = 0
@@ -112,7 +102,9 @@ def buscar_raiz(texto, raiz):
         if simbolo not in alfabeto:
             # Cuando haya puntos finales, comas, etc. Ver si la palabra anterior fue aceptada
             if palabra_actual and raiz_encontrada:
-                ocurrencias.append(Ocurrencia(palabra_actual, linea, inicio_palabra))
+                ocurrencias.append(
+                    Ocurrencia(palabra_actual, raiz, linea, inicio_palabra)
+                )
 
             estado_actual = "s0"
             inicio_palabra = None
@@ -135,7 +127,7 @@ def buscar_raiz(texto, raiz):
             raiz_encontrada = True
 
     if palabra_actual and raiz_encontrada:
-        ocurrencias.append(Ocurrencia(palabra_actual, linea, inicio_palabra))
+        ocurrencias.append(Ocurrencia(palabra_actual, raiz, linea, inicio_palabra))
 
     return ocurrencias
 
