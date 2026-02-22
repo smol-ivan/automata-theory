@@ -1,0 +1,6 @@
+Contacto: juan@email.com
+Telefono: (555) 123-4567
+Fecha: 15/02/2026
+Visita: https://ejemplo.com
+
+Este es un mensaje secreto.
