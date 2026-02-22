@@ -37,23 +37,23 @@ def analizar_log(archivo):
     print("=== Análisis de sistema.log ===")
     print("ERRORES encontrados:")
     for timestamp, mensaje in errores:
-        print(f"\t[{timestamp}] {mensaje}", )
+        print(f"[{timestamp}] {mensaje}")
     
     print("IPs detectadas:")
     for ip in ips:
-        print(f"\t{ip}")
+        print(ip)
     
     print("Archivos mencionados:")
     for archivo in archivos:
-        print(f'\t{archivo}')
+        print(archivo)
     
     print("Resumen por tipo:")
     for tipo in ['ERROR', 'INFO', 'WARNING']:
-        print(f"\t{tipo}: {contador[tipo]}")
+        print(f"{tipo}: {contador[tipo]}")
     
     print("Tiempos de ejecución:")
     for tiempo in tiempos:
-        print(f"\t{tiempo}")
+        print(tiempo)
 
 if __name__ == "__main__":
     analizar_log("./pruebas/sistema.log")
