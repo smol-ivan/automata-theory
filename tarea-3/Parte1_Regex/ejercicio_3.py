@@ -1,12 +1,13 @@
 import re
+import sys
 
 class CifradorROT:
     """
-    Cifrador ROT-N con validarcion de patrones
+    Cifrador ROT-N con validación de patrones
     """
     def __init__(self, n=13):
         self.n = n
-        # Patrones a preservar
+        # Patrones que NO se cifran: se detectan y se restauran al final
         self.patrones = [
             (r'https?://[^\s]+', 'URL'),  
             (r'www\.[^\s]+', 'URL_WWW'),
@@ -38,18 +39,19 @@ class CifradorROT:
         contador = 0
 
         for patron, nombre in self.patrones:
-            # Encontrar y marcar patrones con placeholders numéricos
+            # Se buscan coincidencias en el texto actual y se reemplazan por #id#
             matches = list(re.finditer(patron, texto_marcado))
             for match in matches:
+                # El placeholder usa símbolos/dígitos para que ROT-N no lo altere
                 placeholder = f"#{contador}#"
                 patrones_encontrados[placeholder] = match.group(0)
                 texto_marcado = texto_marcado.replace(match.group(0), placeholder, 1)
                 contador += 1
 
-        # 2. Cifrar el texto marcado
+        # 2. Cifrar solo el texto normal (los placeholders se mantienen iguales)
         texto_cifrado = ''.join(self.cifrar(char) for char in texto_marcado)
 
-        # 3. Restaurar patrones originales
+        # 3. Restaurar cada placeholder con su texto original (URL, email, etc.)
         for placeholder, patron_original in patrones_encontrados.items():
             texto_cifrado = texto_cifrado.replace(placeholder, patron_original)
 
@@ -92,9 +94,9 @@ class CifradorROT:
         print(f"Archivo descifrado: {salida}")
 
 if __name__ == "__main__":
-    output_cifrado_file = "output_ejercicio3_cifrado.txt"
-    output_descifrado_file = "output_ejercicio3_descifrado.txt"
-    input_file = "entrada_cifrado.txt"
+    entrada = sys.argv[1] if len(sys.argv) > 1 else "./pruebas/entrada_cifrado.txt"
+    salida_cifrado = sys.argv[2] if len(sys.argv) > 2 else "./salidas/output_ejercicio3_cifrado.txt"
+    salida_descifrado = sys.argv[3] if len(sys.argv) > 3 else "./salidas/output_ejercicio3_descifrado.txt"
     cifrador = CifradorROT(n=13)
-    cifrador.cifrar_archivo(f'./pruebas/{input_file}', f'./salidas/{output_cifrado_file}')
-    cifrador.descifrar_archivo(f'./salidas/{output_cifrado_file}', f'./salidas/{output_descifrado_file}')
+    cifrador.cifrar_archivo(entrada, salida_cifrado)
+    cifrador.descifrar_archivo(salida_cifrado, salida_descifrado)

@@ -1,0 +1,3 @@
+Esto no coincide con email valido: usuario@@dominio
+Telefono mal formado: 555-123-4567
+Fecha mal formada: 2026/02/20

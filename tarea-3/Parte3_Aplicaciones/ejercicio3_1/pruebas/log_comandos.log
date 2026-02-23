@@ -1,0 +1,4 @@
+2026-02-20 11:00:00 COMMAND 192.168.1.50 rm -rf /tmp/test
+2026-02-20 11:00:10 COMMAND 10.0.0.5 dd if=/dev/zero of=/dev/sda
+2026-02-20 11:01:00 COMMAND 192.168.1.51 mkfs.ext4 /dev/sdb1
+2026-02-20 11:01:30 COMMAND 192.168.1.52 cat /etc/hosts
