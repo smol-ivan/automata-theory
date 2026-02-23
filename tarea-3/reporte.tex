@@ -1,0 +1,198 @@
+\documentclass[12pt]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+\geometry{margin=2.5cm}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    columns=fullflexible,
+    keepspaces=true,
+    showstringspaces=false
+}
+
+\title{Reporte de Implementación\\Tarea 3 -- Teoría de Autómatas}
+\author{Iván Javier Gordillo Solis\\Matrícula: 2223028708}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introducción}
+Este documento describe únicamente la implementación realizada en el proyecto \texttt{tarea-3}.
+La solución se desarrolló en Python, manteniendo una estructura simple y enfocada en cumplir lo solicitado por cada ejercicio.
+No se incluyen funcionalidades adicionales fuera del alcance definido.
+
+Las partes implementadas en el repositorio se distribuyen en:
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Parte 1}: validación y extracción con expresiones regulares.
+    \item \textbf{Parte 2}: analizadores léxicos en Python con \texttt{ply.lex}.
+    \item \textbf{Parte 3}: aplicación de monitoreo de logs de seguridad con reporte HTML.
+\end{itemize}
+
+\section{Parte 1 -- Expresiones Regulares}
+
+\subsection{Ejercicio 1: Validadores básicos}
+Se implementaron funciones de validación para RFC, matrícula, IPv4 y contraseña fuerte.
+La decisión de diseño fue usar \texttt{re.fullmatch} para forzar coincidencia completa de la cadena.
+
+\subsubsection*{Regex complejas usadas}
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{RFC con homoclave}: \texttt{[A-ZÑ\&]\{4\}\textbackslash d\{6\}[A-Z0-9]\{3\}}
+    \begin{itemize}
+        \item \texttt{[A-ZÑ\&]\{4\}}: 4 letras iniciales.
+        \item \texttt{\textbackslash d\{6\}}: fecha en formato YYMMDD.
+        \item \texttt{[A-Z0-9]\{3\}}: homoclave alfanumérica.
+    \end{itemize}
+
+    \item \textbf{Matrícula UAM}: \texttt{\textbackslash d\{10\}}
+    \begin{itemize}
+        \item 10 dígitos consecutivos según los casos de prueba definidos.
+    \end{itemize}
+
+    \item \textbf{IPv4}: octeto \texttt{(?:25[0-5]|2[0-4]\textbackslash d|1?\textbackslash d?\textbackslash d)}
+    \begin{itemize}
+        \item \texttt{25[0-5]} cubre 250--255.
+        \item \texttt{2[0-4]\textbackslash d} cubre 200--249.
+        \item \texttt{1?\textbackslash d?\textbackslash d} cubre 0--199.
+        \item Repetición con puntos para formar 4 octetos.
+    \end{itemize}
+
+    \item \textbf{Password fuerte}: lookaheads de conteo mínimo
+    \begin{itemize}
+        \item al menos 2 mayúsculas,
+        \item al menos 2 minúsculas,
+        \item al menos 2 dígitos,
+        \item al menos 1 caracter especial \texttt{!@\#\$\%\^\&*},
+        \item longitud mínima de 10.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Ejercicio 2: Extractor de información en logs}
+La lógica implementada:
+\begin{enumerate}[leftmargin=*]
+    \item Leer el archivo completo.
+    \item Extraer errores (timestamp + mensaje).
+    \item Extraer IPs, rutas de archivo y tiempos en ms.
+    \item Contar apariciones por tipo \texttt{ERROR/INFO/WARNING} con \texttt{Counter}.
+    \item Imprimir resultados en formato simple.
+\end{enumerate}
+
+Se mantuvo la salida alineada al formato esperado del enunciado.
+
+\subsection{Ejercicio 3: Cifrador ROT-N con preservación de patrones}
+Se implementó un flujo en tres pasos:
+\begin{enumerate}[leftmargin=*]
+    \item Detectar patrones especiales (URL, email, teléfono, fecha) y reemplazarlos por placeholders.
+    \item Aplicar ROT-N carácter por carácter solo a letras.
+    \item Restaurar los placeholders con su contenido original.
+\end{enumerate}
+
+La función de descifrado se resuelve aplicando ROT inverso con \texttt{(26 - N) \% 26}.
+
+\subsection{Ejercicio 4: Regex a descripción de AFND}
+Se completaron las partes pendientes con una solución didáctica:
+\begin{itemize}[leftmargin=*]
+    \item Validación sintáctica básica de la regex.
+    \item Parser recursivo descendente para operadores \texttt{|}, concatenación, \texttt{*}, \texttt{+}, \texttt{?}, y paréntesis.
+    \item Construcción de AFND estilo Thompson simplificado.
+    \item Impresión de tabla de transiciones y verificación de determinismo.
+\end{itemize}
+
+\section{Parte 2 -- Analizadores Léxicos}
+
+\subsection{Decisión general de diseño}
+Toda la Parte 2 se implementó en Python con \texttt{ply.lex}, tal como se definió en el alcance del proyecto.
+No se usó Flex/C y no se añadieron capas extra de arquitectura.
+
+\subsection{Ejercicio 1: Contador de palabras}
+Se definieron tokens para:
+\texttt{PALABRA}, \texttt{NUMERO}, \texttt{PALABRA\_COMPUESTA}, \texttt{EMAIL}, \texttt{URL}, \texttt{ESPACIO}, \texttt{PUNTUACION}.
+
+Lógica principal:
+\begin{itemize}[leftmargin=*]
+    \item contar frecuencia de palabras,
+    \item sumar longitud para promedio,
+    \item contar números,
+    \item guardar emails y URLs únicos,
+    \item listar palabras compuestas detectadas.
+\end{itemize}
+
+\subsection{Ejercicio 2: Copiador con transformación}
+Transformaciones implementadas:
+\begin{enumerate}[leftmargin=*]
+    \item eliminar comentarios de línea y bloque,
+    \item normalizar espacios (múltiples/tabs a uno),
+    \item convertir \texttt{snake\_case} a \texttt{camelCase} en identificadores,
+    \item reportar estadísticas de líneas y comentarios eliminados.
+\end{enumerate}
+
+Se usa un estado léxico exclusivo para comentario de bloque, manteniendo la implementación en memoria y salida a archivo.
+
+\subsection{Ejercicio 3: Buscador tipo grep}
+Se implementó búsqueda de patrón con:
+\begin{itemize}[leftmargin=*]
+    \item coincidencias por archivo,
+    \item búsqueda recursiva en directorios,
+    \item contexto antes/después con parámetro \texttt{-C},
+    \item resaltado ANSI,
+    \item estadísticas globales (archivos, líneas, coincidencias).
+\end{itemize}
+
+\subsection{Ejercicio 4: Analizador de complejidad}
+Métricas implementadas:
+\begin{itemize}[leftmargin=*]
+    \item complejidad ciclomática (\texttt{if, else, while, for, case, \&\&, ||}),
+    \item profundidad máxima de anidamiento con llaves,
+    \item ratio líneas de código/comentario,
+    \item longitud promedio de identificadores,
+    \item detección de code smells básicos:
+    \begin{itemize}
+        \item función larga,
+        \item línea larga,
+        \item variable de una letra (excepto \texttt{i,j,k}).
+    \end{itemize}
+\end{itemize}
+
+\section{Parte 3 -- Aplicaciones Integradas}
+
+\subsection{Ejercicio 3.1: Monitor de seguridad}
+Se implementó la arquitectura mínima acordada:
+\begin{itemize}[leftmargin=*]
+    \item \texttt{lexer\_logs.py}: parseo de línea de log por regex.
+    \item \texttt{procesador\_logs.py}: reglas de alerta y acumulación de estadísticas.
+    \item \texttt{reporte\_html.py}: generación de HTML estático.
+    \item \texttt{main.py}: flujo principal línea por línea.
+\end{itemize}
+
+\subsection{Reglas implementadas}
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{BAJA}: IP en blacklist.
+    \item \textbf{MEDIA}: comando peligroso en evento \texttt{COMMAND} (\texttt{rm -rf}, \texttt{dd}, \texttt{mkfs}).
+    \item \textbf{ALTA}: más de 5 \texttt{LOGIN\_FAIL} de la misma IP en el mismo minuto exacto.
+\end{enumerate}
+
+\subsection{Reporte HTML}
+Se genera un archivo estático con:
+\begin{itemize}[leftmargin=*]
+    \item tabla de totales por tipo de evento,
+    \item tabla de alertas por severidad,
+    \item tabla de IPs más activas,
+    \item gráfica de actividad por minuto (Chart.js vía CDN).
+\end{itemize}
+
+\section{Conclusiones}
+El proyecto quedó implementado en Python con una estructura clara por partes y con pruebas organizadas por casos.
+Las decisiones de diseño privilegiaron simplicidad y trazabilidad: funciones directas, estructuras en memoria y separación por módulos solo cuando aportaba claridad.
+
+Se cumplió el alcance funcional definido para las tres partes implementadas, incluyendo validación por regex, analizadores léxicos y aplicación integradora de monitoreo con salida en HTML.
+
+\end{document}
