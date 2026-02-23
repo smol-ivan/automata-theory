@@ -1,0 +1,3 @@
+error: fallo de red
+ok
+error: fallo de disco
