@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Reporte de Seguridad</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Reporte de Seguridad</h1>
+
+  <h2>Resumen de eventos</h2>
+  <table border="1" cellpadding="6">
+    <tr><th>Evento</th><th>Total</th></tr>
+    <tr><td>LOGIN_FAIL</td><td>6</td></tr>
+    <tr><td>LOGIN_OK</td><td>1</td></tr>
+    <tr><td>COMMAND</td><td>2</td></tr>
+  </table>
+
+  <h2>Alertas por severidad</h2>
+  <table border="1" cellpadding="6">
+    <tr><th>Severidad</th><th>Total</th></tr>
+    <tr><td>BAJA</td><td>1</td></tr>
+    <tr><td>MEDIA</td><td>2</td></tr>
+    <tr><td>ALTA</td><td>1</td></tr>
+  </table>
+
+  <h2>IPs más activas</h2>
+  <table border="1" cellpadding="6">
+    <tr><th>IP</th><th>Eventos</th></tr>
+    <tr><td>192.168.1.10</td><td>6</td></tr>
+<tr><td>192.168.1.15</td><td>1</td></tr>
+<tr><td>192.168.1.20</td><td>1</td></tr>
+<tr><td>10.0.0.5</td><td>1</td></tr>
+  </table>
+
+  <h2>Actividad por minuto</h2>
+  <canvas id="graficaActividad" width="900" height="320"></canvas>
+  <script>
+    const etiquetas = ['2026-02-20 10:30', '2026-02-20 10:31', '2026-02-20 10:32'];
+    const valores = [6, 1, 2];
+    new Chart(document.getElementById('graficaActividad'), {
+      type: 'line',
+      data: {
+        labels: etiquetas,
+        datasets: [{
+          label: 'Eventos por minuto',
+          data: valores,
+          borderWidth: 2,
+          fill: false,
+          tension: 0
+        }]
+      }
+    });
+  </script>
+</body>
+</html>
