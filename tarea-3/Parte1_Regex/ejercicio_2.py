@@ -1,4 +1,5 @@
 import re
+import sys
 from collections import Counter
 
 def analizar_log(archivo):
@@ -56,4 +57,5 @@ def analizar_log(archivo):
         print(tiempo)
 
 if __name__ == "__main__":
-    analizar_log("./pruebas/sistema.log")
+    ruta = sys.argv[1] if len(sys.argv) > 1 else "./pruebas/sistema.log"
+    analizar_log(ruta)

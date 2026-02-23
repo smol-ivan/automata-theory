@@ -1,6 +1,6 @@
-import argparse
 import os
 import re
+import sys
 from collections import deque
 
 import ply.lex as lex
@@ -89,18 +89,31 @@ class GrepSimplificado:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Grep simplificado")
-    parser.add_argument("patron")
-    parser.add_argument("ruta")
-    parser.add_argument("-C", type=int, default=0, dest="contexto")
-    args = parser.parse_args()
+    if len(sys.argv) < 3:
+        print(f"Uso: python {sys.argv[0]} <patron> <ruta> [-C num]")
+        return
 
-    buscador = GrepSimplificado(args.patron, max(args.contexto, 0))
+    patron = sys.argv[1]
+    ruta = sys.argv[2]
+    contexto = 0
 
-    if os.path.isdir(args.ruta):
-        buscador.buscar_en_directorio(args.ruta)
+    i = 3
+    while i < len(sys.argv):
+        if sys.argv[i] == "-C" and i + 1 < len(sys.argv):
+            try:
+                contexto = int(sys.argv[i + 1])
+            except ValueError:
+                contexto = 0
+            i += 2
+        else:
+            i += 1
+
+    buscador = GrepSimplificado(patron, max(contexto, 0))
+
+    if os.path.isdir(ruta):
+        buscador.buscar_en_directorio(ruta)
     else:
-        buscador.buscar_en_archivo(args.ruta)
+        buscador.buscar_en_archivo(ruta)
 
     print("\n--- Estadísticas ---")
     print(f"Archivos escaneados: {buscador.archivos_escaneados}")

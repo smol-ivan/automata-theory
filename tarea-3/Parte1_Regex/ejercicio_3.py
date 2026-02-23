@@ -1,4 +1,5 @@
 import re
+import sys
 
 class CifradorROT:
     """
@@ -93,9 +94,9 @@ class CifradorROT:
         print(f"Archivo descifrado: {salida}")
 
 if __name__ == "__main__":
-    output_cifrado_file = "output_ejercicio3_cifrado.txt"
-    output_descifrado_file = "output_ejercicio3_descifrado.txt"
-    input_file = "entrada_cifrado.txt"
+    entrada = sys.argv[1] if len(sys.argv) > 1 else "./pruebas/entrada_cifrado.txt"
+    salida_cifrado = sys.argv[2] if len(sys.argv) > 2 else "./salidas/output_ejercicio3_cifrado.txt"
+    salida_descifrado = sys.argv[3] if len(sys.argv) > 3 else "./salidas/output_ejercicio3_descifrado.txt"
     cifrador = CifradorROT(n=13)
-    cifrador.cifrar_archivo(f'./pruebas/{input_file}', f'./salidas/{output_cifrado_file}')
-    cifrador.descifrar_archivo(f'./salidas/{output_cifrado_file}', f'./salidas/{output_descifrado_file}')
+    cifrador.cifrar_archivo(entrada, salida_cifrado)
+    cifrador.descifrar_archivo(salida_cifrado, salida_descifrado)

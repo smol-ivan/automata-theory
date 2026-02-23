@@ -1,4 +1,5 @@
 from pathlib import Path
+import sys
 
 from lexer_logs import parsear_linea_log
 from procesador_logs import cargar_blacklist, crear_estado, procesar_evento
@@ -7,9 +8,9 @@ from reporte_html import generar_reporte_html
 
 def main():
     base = Path(__file__).resolve().parent
-    ruta_log = base / "pruebas" / "seguridad.log"
-    ruta_blacklist = base / "config" / "blacklist.txt"
-    ruta_reporte = base / "salidas" / "reporte.html"
+    ruta_log = Path(sys.argv[1]) if len(sys.argv) > 1 else base / "pruebas" / "seguridad.log"
+    ruta_blacklist = Path(sys.argv[2]) if len(sys.argv) > 2 else base / "config" / "blacklist.txt"
+    ruta_reporte = Path(sys.argv[3]) if len(sys.argv) > 3 else base / "salidas" / "reporte.html"
 
     blacklist = cargar_blacklist(ruta_blacklist)
     estado = crear_estado()
